@@ -1,0 +1,11 @@
+
+[clickhouse-db]
+clickhouse_host_name_ = "g603ex9z1m.ap-south-1.aws.clickhouse.cloud"
+table_name_ = "Incubyte_Assignment_Employee_Table_"
+table_columns_ = ['First_Name' , 'Last_Name', 'Gross_Salary', 'Employee_Location', 'Time_Zone']
+local_dir_data_ = "employee_data_raw_txt_/"
+employee_first_name_list_ = "employee_first_names_.txt"
+employee_last_name_list_ = "employee_last_names_.txt"
+employee_gross_salary_list_ = "employee_gross_salary_.txt"
+employee_location_list_ = "employee_locations_.txt"
+employee_timezone_list_ = "employee_timezone_.txt"

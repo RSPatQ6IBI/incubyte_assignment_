@@ -1,59 +1,67 @@
-# Incubyte Assignment : Salary Management Tool 
+"""# 💼 Incubyte Assignment: Salary Management Tool 🚀
 
-## This is a submission to the assignmnent by incubate
+## 📝 This is a submission to the assignment by Incubyte
 
-### Problem Statement 
-#### Expectations 
-This exercise is intentionally designed to assess how you think, design, and build software in an AI‑driven environment.  
+---
+
+### 🎯 Problem Statement 
+
+#### ✨ Expectations 
+This exercise is intentionally designed to assess how you think, design, and build software in an AI‑driven environment.   
    
-You are required to use AI tools to accelerate your work. We care about how you use them, the clarity of your thinking, and the quality of your engineering decisions.  
+You are required to use AI tools to accelerate your work. We care about how you use them, the clarity of your thinking, and the quality of your engineering decisions.   
    
-We expect you to:  
- - Demonstrate clarity in thought and structured problem solving  
- - Show strong engineering fundamentals & product thinking 
- - Make thoughtful architectural and design decisions  
- - Write production‑quality code and tests  
- - Use AI intentionally while maintaining correctness and quality  
+We expect you to:   
+* 🧠 **Demonstrate clarity** in thought and structured problem solving  
+* 🛠️ **Show strong engineering fundamentals** & product thinking 
+* 🏗️ **Make thoughtful architectural** and design decisions  
+* 🧪 **Write production‑quality code** and tests  
+* 🤖 **Use AI intentionally** while maintaining correctness and quality  
    
-Please make incremental commits so we can understand how your solution evolved. 
-Goal: 
-Build a minimal yet usable salary management tool for an organiszation with 10,000 employees. 
-#### User Persona: 
-HR Manager of the org 
-#### Requirements: 
--  Managing Employees - 
-    - Add, View, update, and delete employees via UI 
+📂 *Please make incremental commits so we can understand how your solution evolved.* 🏁 **Goal:** Build a minimal yet usable salary management tool for an organization with 10,000 employees. 
 
-The employee must have a full name, job title, country, salary, along with any other meaningful data that you believe should be captured 
-Salary Insights via UI - 
-Minimum, maximum, average salary of employees in a country 
-Average salary for the given Job Title in a country. 
-Any other meaningful metrics you believe are helpful for the user persona. 
+#### 👥 User Persona
+* 🧑‍💼 **HR Manager** of the organization 
 
-### Proposed Solution 
+#### 📋 Requirements
+* 👤 **Managing Employees:**
+    * Add, View, update, and delete employees via UI 
+    * *Note:* The employee must have a full name, job title, country, salary, along with any other meaningful data that you believe should be captured.
+* 📊 **Salary Insights via UI:**
+    * Minimum, maximum, and average salary of employees in a country. 
+    * Average salary for the given Job Title in a country. 
+    * Any other meaningful metrics you believe are helpful for the user persona. 
 
-- Built a MVP with Streamlit (UI), Python (Backbone), and Clickhouse (Database)
+---
 
-#### Frontend (UI)
-- Built with Streamlit, has a login page (with persona as HR Manager and Guests)
-- Once logged in with proper credentials , leads to the Employee Management Page
-- The UI displays options to add and delete desired employees 
-- The UI also displays salary insights, and related metrics in visual representations
+### 💡 Proposed Solution 
 
-#### Backend 
-- Built with Python 
-    + Manages connection with database, and other database operations such as add, delete etc.
-    + All dapaters are maintained in `db_utils_`
+* 🌟 Built an MVP with **Streamlit** (UI), **Python** (Backbone), and **ClickHouse** (Database).
 
-#### Clickhouse (DB)
-- Built a database using dummy employee information, contained in `employee_data_raw_txt_`
-- Connection management through user details mentioned in 'pyproject.toml'
+#### 🎨 Frontend (UI)
+* 💻 Built with **Streamlit**, featuring a login page (with roles for HR Manager and Guests).
+* 🔓 Once logged in with proper credentials, it leads to the **Employee Management Page**.
+* ➕ The UI displays options to **add and delete** desired employees. 
+* 📈 The UI also displays **salary insights** and related metrics using visual representations.
 
+#### ⚙️ Backend 
+* 🐍 Built with **Python**.
+    * 🔌 Manages connections with the database and handles operations such as add, delete, etc.
+    * 🛠️ All adapters are maintained in `db_utils_`.
 
-.env file contains login passwords which is masked in GIT uploads using file `gitignore`
+#### 🗄️ ClickHouse (DB)
+* 📊 Built a database using dummy employee information contained in `employee_data_raw_txt_`.
+* 🔑 Connection management is handled through user details mentioned in `pyproject.toml`.
 
-### Overall Flow
-The application follows the illustrated routes
+🔒 `.env` file contains login passwords which are masked in GIT uploads using the `.gitignore` file.
+
+---
+
+### 🔄 Overall Flow
+The application follows these illustrated routes:
+
+Code output
+File created successfully: README.md
 
 ```mermaid
 graph TD;
@@ -64,4 +72,3 @@ graph TD;
     establish_connection_clickhouse_-->import_data_from_clickhouse_;
     app-->data_fetcher_streamlit_;
     data_fetcher_streamlit_-->UI;
-```

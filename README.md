@@ -43,14 +43,14 @@ Any other meaningful metrics you believe are helpful for the user persona.
 #### Backend 
 - Built with Python 
     + Manages connection with database, and other database operations such as add, delete etc.
-    + All dapaters are maintained in 'db_utils_'
+    + All dapaters are maintained in `db_utils_`
 
 #### Clickhouse (DB)
-- Built a database using dummy employee information, contained in 'employee_data_raw_txt_'
+- Built a database using dummy employee information, contained in `employee_data_raw_txt_`
 - Connection management through user details mentioned in 'pyproject.toml'
 
 
-.env file contains login passwords which is masked in GIT uploads using file 'gitignore'
+.env file contains login passwords which is masked in GIT uploads using file `gitignore`
 
 ### Overall Flow
 The application follows the illustrated routes

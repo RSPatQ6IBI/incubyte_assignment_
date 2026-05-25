@@ -1,4 +1,4 @@
-"""# 💼 Incubyte Assignment: Salary Management Tool 🚀
+# 💼 Incubyte Assignment: Salary Management Tool 🚀
 
 ## 📝 This is a submission to the assignment by Incubyte
 

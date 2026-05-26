@@ -1,16 +1,21 @@
-import db_utils_.prepare_data_for_table_ as import_data
-from db_utils_.establish_connection_clickhouse_ import get_clickhouse_client_
-# import prepare_data_for_table_ as import_data
-# from establish_connection_clickhouse_ import get_clickhouse_client_
+# import db_utils_.prepare_data_for_table_ as import_data
+# from db_utils_.establish_connection_clickhouse_ import get_clickhouse_client_
+import prepare_data_for_table_ as import_data
+from establish_connection_clickhouse_ import get_clickhouse_client_
 import clickhouse_connect
 from pathlib import Path
-import db_utils_.db_commands_ as db_commands_
-# import db_commands_ as db_commands_
+# import db_utils_.db_commands_ as db_commands_
+import db_commands_ as db_commands_
 import pandas as pd
 
 def check_or_create_table_():
+    """
+    Checks if the configured table exists in ClickHouse. If not, creates it.
+    Returns: Client connection, table name, and list of columns.
+    """
     clickhouse_client_ = get_clickhouse_client_()
-
+        
+    # Path setup to read configuration from pyproject.toml
     import tomllib
     parent_dir = Path(__file__).resolve().parent.parent
     config_path = str(parent_dir / "pyproject.toml")
@@ -20,6 +25,7 @@ def check_or_create_table_():
     table_ = data["clickhouse-db"]["table_name_"]   # Nested entries (tables)
     table_cols_ = data["clickhouse-db"]["table_columns_"]   # Nested entries (tables)
     
+    # Verify table existence via database command
     check_table_ = clickhouse_client_.command(db_commands_.check_table(table_name_=table_))
 
     if check_table_==0:
@@ -29,11 +35,18 @@ def check_or_create_table_():
         print("Table created -- >> ", check_table_)
     else:
         print('Table already exists -- >>')
+        tab_entries = clickhouse_client_.query(db_commands_.fetch_all_entries_from_table(table_name_=table_))
+        print('The table entries -- >> ', tab_entries)
     return clickhouse_client_, table_, table_cols_
 
 def prep_data_to_insert_():
+    """
+    Imports raw data, processes it into a single DataFrame, and returns it.
+    """
     emp_first_names_, emp_last_names_, emp_gross_sal_, emp_locs_, emp_timezones_ = import_data.get_emp_details_from_raw_txt_()
+    # Re-indexing to ensure consistent length
     emp_locs_.index = range(0,10000)
+    # Concatenate all series into one DataFrame
     mgrd_ = pd.concat([emp_first_names_, emp_last_names_], axis=1)
     mgrd_ = pd.concat([mgrd_, emp_gross_sal_], axis=1)
     mgrd_ = pd.concat([mgrd_, emp_locs_], axis=1)
@@ -41,15 +54,28 @@ def prep_data_to_insert_():
     return mgrd_
 
 def insert_dataframes_to_table_(the_client_, this_table_, the_tab_cols_, the_mgrd_data_):
+    """
+    Clears the existing table and performs a bulk insert of new data.
+    """
     emp_first_names_, emp_last_names_, emp_gross_sal_, emp_locs_, emp_timezones_ = import_data.get_emp_details_from_raw_txt_()
-    print('Making the table blank .. ')
+    print('Removing the entries in table, resulting in blank table .. ')
     the_client_.command(db_commands_.delete_all_entries_from_table(table_name_=this_table_))
     the_client_.insert(this_table_, the_mgrd_data_, column_names=the_tab_cols_)
     print("Inserted entries from txt  .. ")
 
+def refresh_dataframe_changes_in_frontend_(the_client_, this_table_, the_modified_df_):
+    print(' -- >> -->> Insert data to clickhouse table ..')
+    print(the_modified_df_.head())
+    print('The dataframe insert command .. ')
+    the_client_.command(db_commands_.delete_all_entries_from_table(table_name_=this_table_))
+    the_client_.insert_df(table = this_table_, df = the_modified_df_ )
+
 
 #### FUNCTION USAGE
 if __name__ == "__main__":
+    """
+    Updates the table with a modified DataFrame (often from frontend interaction).
+    """
     this_client_, the_table_, the_table_cols_ = check_or_create_table_()
     data_from_txt_ = prep_data_to_insert_()
     insert_dataframes_to_table_(this_client_, the_table_, the_table_cols_, data_from_txt_)

@@ -9,7 +9,9 @@ import plotly.express as px
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from data_fetcher_streamlit_ import get_from_table_
 import db_utils_.insert_data_to_clickhouse_table_ as insert_clickhouse_
+import db_utils_.establish_connection_clickhouse_ as get_conn_
 import db_utils_.db_commands_ as commands_
+import db_utils_.establish_connection_clickhouse_ as clickhouse_connect
 st.set_page_config(page_title="Inventory Explorer", page_icon="📦")
 from pathlib import Path
 
@@ -24,8 +26,13 @@ table_name_ = data["clickhouse-db"]["table_name_"]   # Nested entries (tables)
 # Involking data_fetcher_streamlit
 df = get_from_table_()
 df['Select'] = False
+db_client_ = clickhouse_connect.get_clickhouse_client_()
 
 #--------------------------------------------------
+st.header('Application')
+# Sidebar navigation
+st.sidebar.page_link('py_login_page_streamlit_.py', label='Login')
+st.sidebar.page_link('pages/app.py', label='Application')
 
 
 #--------------------------------------------------
@@ -70,7 +77,14 @@ with col2:
                 drop=True
             )
             st.success("Selected rows deleted successfully!")
+            df_modified_ = st.session_state["employee_df"]
+            df_modified_ = df_modified_.drop(columns='Select')
+
+            insert_clickhouse_.refresh_dataframe_changes_in_frontend_\
+                (the_client_=db_client_, this_table_ = table_name_, \
+                the_modified_df_ = df_modified_)
             st.rerun()
+
         else:
             st.warning("Please check at least one row's box to delete.")
 
@@ -121,6 +135,12 @@ if st.session_state["show_add_form"]:
                     df = pd.concat([new_row_df, df], join='inner', ignore_index=True)
                     st.session_state["employee_df"] = df
                     st.session_state["table_update"] = True    
+                    df_modified_ = st.session_state["employee_df"]
+                    df_modified_ = df_modified_.drop(columns='Select')
+
+                    insert_clickhouse_.refresh_dataframe_changes_in_frontend_\
+                        (the_client_=db_client_, this_table_ = table_name_, \
+                        the_modified_df_ = df_modified_)
                     st.rerun()
                     
                     # Close form and refresh layout
@@ -135,11 +155,9 @@ if st.session_state["show_add_form"]:
 
 st.write("---")
 
-# 3. Render the Scrollable Interactive Data Editor
-# We assign a key so Streamlit captures updates automatically
+### Render the Scrollable Interactive Data Editor
+### Assign a key so Streamlit captures updates automatically
 
-# if st.session_state['reload_insights']:
-#     st.rerun()
 edited_df = st.data_editor(
     st.session_state["employee_df"],
     width='stretch',
@@ -159,10 +177,10 @@ edited_df = st.data_editor(
     },
 )
 
-# 4. Critical Step: Save any live on-screen cell edits back to Session State
+#### Critical Step: Save any live on-screen cell edits back to Session State
 st.session_state["employee_df"] = edited_df
 
-# 5. Optional Metric Dashboard to show live data synchronization
+#### Optional Metric Dashboard to show live data synchronization
 st.write("---")
 st.subheader("📊 Live Insights")
 m_col1, m_col2, m_col3 = st.columns(3)
@@ -178,9 +196,36 @@ fig = px.pie(edited_df, values='Gross_Salary', names='Employee_Location', title=
 st.plotly_chart(fig)
 
 location_arr_ = edited_df['Employee_Location'].unique()
-print(10*'--..>>', location_arr_)
 salary_avg_val_ = edited_df.groupby('Employee_Location')['Gross_Salary'].mean()
-print(10*'--..>>', salary_avg_val_)
 
-fig = px.bar(x=location_arr_, y=salary_avg_val_, title="Simple Bar Chart")
+fig = px.bar(x = location_arr_, y=salary_avg_val_, title="Average Salaries across locations")
 st.plotly_chart(fig)
+
+
+
+fig = px.violin(
+    edited_df, 
+    x='Employee_Location',       # Unique locations on the x-axis
+    y='Gross_Salary',         # Salary values on the y-axis
+    color='Employee_Location',   # Distinct color for each location
+    box=True,           # Displays a box plot inside to show median, quartiles, and range
+    points='all',       # Optional: shows all individual data points next to the violin
+    title='Salary Distribution, Mean, and Variance by Location',
+    labels={'location': 'Location', 'salary': 'Salary ($)'}
+)
+
+fig.update_traces(
+    meanline_visible=True,  # Adds a dashed line indicating the mean salary
+    box_visible=True        # Ensures the internal box plot is visible for range details
+)
+
+# fig.update_layout(
+#     xaxis_title="Locations",
+#     yaxis_title="Salary Range ($)",
+#     showlegend=False,
+#     template="plotly_white"
+# )
+st.plotly_chart(fig)
+
+st.write("---")
+

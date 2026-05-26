@@ -198,7 +198,7 @@ st.plotly_chart(fig)
 location_arr_ = edited_df['Employee_Location'].unique()
 salary_avg_val_ = edited_df.groupby('Employee_Location')['Gross_Salary'].mean()
 
-fig = px.bar(x = location_arr_, y=salary_avg_val_, title="Average Salaries across locations")
+fig = px.bar(x = location_arr_, y=salary_avg_val_, title="Average Salaries across locations", color=salary_avg_val_)
 st.plotly_chart(fig)
 
 
@@ -209,7 +209,7 @@ fig = px.violin(
     y='Gross_Salary',         # Salary values on the y-axis
     color='Employee_Location',   # Distinct color for each location
     box=True,           # Displays a box plot inside to show median, quartiles, and range
-    points='all',       # Optional: shows all individual data points next to the violin
+    # points='all',       # Optional: shows all individual data points next to the violin
     title='Salary Distribution, Mean, and Variance by Location',
     labels={'location': 'Location', 'salary': 'Salary ($)'}
 )
@@ -219,12 +219,12 @@ fig.update_traces(
     box_visible=True        # Ensures the internal box plot is visible for range details
 )
 
-# fig.update_layout(
-#     xaxis_title="Locations",
-#     yaxis_title="Salary Range ($)",
-#     showlegend=False,
-#     template="plotly_white"
-# )
+fig.update_layout(
+    xaxis_title="Locations",
+    yaxis_title="Salary Range ($)",
+    showlegend=False,
+    template="plotly_white"
+)
 st.plotly_chart(fig)
 
 st.write("---")
